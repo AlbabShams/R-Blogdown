@@ -1,0 +1,99 @@
+---
+title: Analysis of 'Gapminder unemployment 15+' dataset
+author: Albab Shams
+date: '2018-02-07'
+slug: gapminder-unemployment-15-dataset
+categories: []
+tags: []
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+```{r}
+#Importing data into R
+une_15 <- read.csv("D:/DataSets/Practice datasets/Gapminder_unemp.csv")
+head(une_15)
+```
+
+```{r}
+#Lets do some data cleaning
+#Removing the last column containing NAs
+
+une_15n <- select(une_15,-X)
+```
+
+```{r}
+#Removing last row
+une_15n <- une_15n[1:nrow(une_15n)-1, ]
+```
+
+```{r}
+#Renaming first column as "country"
+names(une_15n) <- c("country",1981:2005)
+```
+
+
+```{r}
+#Transforming data
+une_15g <- gather(une_15n,"year","unemp.rate",2:26)
+head(une_15g)
+```
+
+
+```{r}
+#Removing NAs
+une_15g <- subset(une_15g,!is.na(unemp.rate))
+```
+
+```{r}
+#summarizing the data country wise
+une_country <- une_15g %>% group_by(country) %>% summarise(mean.Unem=mean(unemp.rate),median.Unem=median(unemp.rate),n=n())
+```
+```{r}
+head(une_country)
+```
+
+
+```{r}
+#Adding a column named as CountryId in une_country
+une_country$CountryId <- c(1:29)
+head(une_country)
+```
+
+
+```{r}
+#Summarising the data yearwise
+une_year <- une_15g %>% group_by(year) %>% summarise(mean.une.yw=mean(unemp.rate),median.une.yw=median(unemp.rate),n=n())
+```
+```{r}
+head(une_year)
+```
+
+
+```{r}
+#Converting year into numeric datatype
+une_year$year_num <- as.numeric(une_year$year)
+head(une_year)
+```
+
+```{r}
+ggplot(aes(x=year_num,y=mean.une.yw),data=une_year)+geom_point()+geom_line()
+```
+
+
+```{r}
+#Creating scatterplot of mean unemployment rate for countries
+ggplot(aes(x=CountryId,y=mean.Unem),data = une_country)+geom_point()+geom_text(aes(label=country))+scale_y_continuous(breaks = seq(0,18,2))
+```
+```{r}
+#Comparing the unemployment rate over years between two countries
+
+une_15g <- transform(une_15g,year=as.numeric(year))
+attach(une_15g)
+ggplot(aes(x=year,y=unemp.rate),data = filter(une_15g,country %in% c("United States","Canada")))+geom_line(aes(color=country))+scale_x_continuous(breaks = seq(1981,2005,4))
+```

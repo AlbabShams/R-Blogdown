@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>A Hugo website</title>
+    <link>/</link>
+    <description>Recent content on A Hugo website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 07 Feb 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Analysis of &#39;Gapminder unemployment 15&#43;&#39; dataset</title>
+      <link>/2018/02/07/gapminder-unemployment-15-dataset/</link>
+      <pubDate>Wed, 07 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/02/07/gapminder-unemployment-15-dataset/</guid>
+      <description>library(dplyr)## Warning: package &amp;#39;dplyr&amp;#39; was built under R version 3.4.2## ## Attaching package: &amp;#39;dplyr&amp;#39;## The following objects are masked from &amp;#39;package:stats&amp;#39;:## ## filter, lag## The following objects are masked from &amp;#39;package:base&amp;#39;:## ## intersect, setdiff, setequal, unionlibrary(ggplot2)## Warning: package &amp;#39;ggplot2&amp;#39; was built under R version 3.4.3library(tidyr)## Warning: package &amp;#39;tidyr&amp;#39; was built under R version 3.4.2#Importing data into Rune_15 &amp;lt;- read.</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      
+      <guid>/about/</guid>
+      <description>This is a &amp;ldquo;hello world&amp;rdquo; example website for the blogdown package. The theme was forked from @jrutheiser/hugo-lithium-theme and modified by Yihui Xie.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,129 @@
+---
+title: Analysis of 'Gapminder unemployment 15+' dataset
+author: Albab Shams
+date: '2018-02-07'
+slug: gapminder-unemployment-15-dataset
+categories: []
+tags: []
+---
+
+
+
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.4.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 3.4.3</code></pre>
+<pre class="r"><code>library(tidyr)</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 3.4.2</code></pre>
+<pre class="r"><code>#Importing data into R
+une_15 &lt;- read.csv(&quot;D:/DataSets/Practice datasets/Gapminder_unemp.csv&quot;)
+head(une_15)</code></pre>
+<pre><code>##   Total.15..unemployment.... X1981 X1982 X1983 X1984 X1985 X1986 X1987
+## 1                  Australia    NA    NA    NA    NA    NA   8.1   8.0
+## 2                     Canada   7.6  11.0  11.9  11.3  10.6   9.6   8.8
+## 3                 Czech Rep.    NA    NA    NA    NA    NA    NA    NA
+## 4                    Estonia    NA    NA    NA    NA    NA    NA    NA
+## 5                    Finland   4.8   5.3   5.4   5.0   4.9   5.2   5.0
+## 6                     France   7.4   8.1   8.4   9.8  10.2  10.4  10.5
+##   X1988 X1989 X1990 X1991 X1992 X1993 X1994 X1995 X1996 X1997 X1998 X1999
+## 1   7.2   6.1   6.9   9.5  10.4  10.5   9.4   8.2   8.2   8.2   7.7   6.9
+## 2   7.7   7.5   8.1  10.3  11.1  11.3  10.3   9.4   9.6   9.1   8.3   7.6
+## 3    NA    NA    NA    NA    NA   4.3   4.3   4.0   3.9   4.8   6.4   8.7
+## 4    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA
+## 5   4.4   3.1   3.1   6.5  11.6  16.1  16.4  15.2  14.4  12.6  11.3  10.2
+## 6  10.0   9.4   8.9   9.4  10.2  11.5  12.1  11.4  12.0  12.1  11.5  10.8
+##   X2000 X2001 X2002 X2003 X2004 X2005  X
+## 1   6.2   6.7   6.4   6.0   5.5   5.1 NA
+## 2   6.8   7.2   7.6   7.6   7.2   6.7 NA
+## 3   8.8   8.2   7.3   7.8   8.3   8.3 NA
+## 4  13.7  12.5  10.2  10.0   9.5   7.9 NA
+## 5   9.7   9.1   9.0   9.0   8.8   8.3 NA
+## 6   9.5   8.7   9.0   9.8  10.0   9.9 NA</code></pre>
+<pre class="r"><code>#Lets do some data cleaning
+#Removing the last column containing NAs
+
+une_15n &lt;- select(une_15,-X)</code></pre>
+<pre class="r"><code>#Removing last row
+une_15n &lt;- une_15n[1:nrow(une_15n)-1, ]</code></pre>
+<pre class="r"><code>#Renaming first column as &quot;country&quot;
+names(une_15n) &lt;- c(&quot;country&quot;,1981:2005)</code></pre>
+<pre class="r"><code>#Transforming data
+une_15g &lt;- gather(une_15n,&quot;year&quot;,&quot;unemp.rate&quot;,2:26)
+head(une_15g)</code></pre>
+<pre><code>##      country year unemp.rate
+## 1  Australia 1981         NA
+## 2     Canada 1981        7.6
+## 3 Czech Rep. 1981         NA
+## 4    Estonia 1981         NA
+## 5    Finland 1981        4.8
+## 6     France 1981        7.4</code></pre>
+<pre class="r"><code>#Removing NAs
+une_15g &lt;- subset(une_15g,!is.na(unemp.rate))</code></pre>
+<pre class="r"><code>#summarizing the data country wise
+une_country &lt;- une_15g %&gt;% group_by(country) %&gt;% summarise(mean.Unem=mean(unemp.rate),median.Unem=median(unemp.rate),n=n())</code></pre>
+<pre><code>## Warning: package &#39;bindrcpp&#39; was built under R version 3.4.2</code></pre>
+<pre class="r"><code>head(une_country)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##      country mean.Unem median.Unem     n
+##       &lt;fctr&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;
+## 1  Australia  7.560000        7.45    20
+## 2     Canada  8.968000        8.80    25
+## 3 Czech Rep.  6.546154        7.30    13
+## 4    Estonia 10.633333       10.10     6
+## 5    Finland  8.576000        8.80    25
+## 6     France 10.040000       10.00    25</code></pre>
+<pre class="r"><code>#Adding a column named as CountryId in une_country
+une_country$CountryId &lt;- c(1:29)
+head(une_country)</code></pre>
+<pre><code>## # A tibble: 6 x 5
+##      country mean.Unem median.Unem     n CountryId
+##       &lt;fctr&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;     &lt;int&gt;
+## 1  Australia  7.560000        7.45    20         1
+## 2     Canada  8.968000        8.80    25         2
+## 3 Czech Rep.  6.546154        7.30    13         3
+## 4    Estonia 10.633333       10.10     6         4
+## 5    Finland  8.576000        8.80    25         5
+## 6     France 10.040000       10.00    25         6</code></pre>
+<pre class="r"><code>#Summarising the data yearwise
+une_year &lt;- une_15g %&gt;% group_by(year) %&gt;% summarise(mean.une.yw=mean(unemp.rate),median.une.yw=median(unemp.rate),n=n())</code></pre>
+<pre class="r"><code>head(une_year)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##    year mean.une.yw median.une.yw     n
+##   &lt;chr&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;int&gt;
+## 1  1981    5.611111           4.8     9
+## 2  1982    6.666667           5.3     9
+## 3  1983    7.810000           6.9    10
+## 4  1984    8.010000           6.2    10
+## 5  1985    7.781818           4.9    11
+## 6  1986    7.757143           6.2    14</code></pre>
+<pre class="r"><code>#Converting year into numeric datatype
+une_year$year_num &lt;- as.numeric(une_year$year)
+head(une_year)</code></pre>
+<pre><code>## # A tibble: 6 x 5
+##    year mean.une.yw median.une.yw     n year_num
+##   &lt;chr&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
+## 1  1981    5.611111           4.8     9     1981
+## 2  1982    6.666667           5.3     9     1982
+## 3  1983    7.810000           6.9    10     1983
+## 4  1984    8.010000           6.2    10     1984
+## 5  1985    7.781818           4.9    11     1985
+## 6  1986    7.757143           6.2    14     1986</code></pre>
+<pre class="r"><code>ggplot(aes(x=year_num,y=mean.une.yw),data=une_year)+geom_point()+geom_line()</code></pre>
+<p><img src="/post/2018-02-07-gapminder-unemployment-15-dataset_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>#Creating scatterplot of mean unemployment rate for countries
+ggplot(aes(x=CountryId,y=mean.Unem),data = une_country)+geom_point()+geom_text(aes(label=country))+scale_y_continuous(breaks = seq(0,18,2))</code></pre>
+<p><img src="/post/2018-02-07-gapminder-unemployment-15-dataset_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>#Comparing the unemployment rate over years between two countries
+
+une_15g &lt;- transform(une_15g,year=as.numeric(year))
+attach(une_15g)
+ggplot(aes(x=year,y=unemp.rate),data = filter(une_15g,country %in% c(&quot;United States&quot;,&quot;Canada&quot;)))+geom_line(aes(color=country))+scale_x_continuous(breaks = seq(1981,2005,4))</code></pre>
+<p><img src="/post/2018-02-07-gapminder-unemployment-15-dataset_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
