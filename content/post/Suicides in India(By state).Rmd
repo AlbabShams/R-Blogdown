@@ -1,0 +1,75 @@
+---
+title: "Untitled"
+author: "Albab Shams"
+date: "13 February 2018"
+output: html_document
+---
+
+```{r,warning=FALSE,message=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(ggthemes)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(data.table)
+```
+
+```{r,warning=FALSE}
+sui <- read.csv("D:/DataSets/Practice datasets/suicides_in_India.csv")
+
+sui_cleaned <- sui[which(sui$State!="Total (All India)" & sui$State!="Total(Uts)" & sui$State!="Total (States)") & sui$Age_group!= "0-100+", ]
+```
+
+Grouping the data by "state" and "year"
+```{r}
+sui_1 <- sui_cleaned %>% group_by(State,Year) %>% summarise(total=sum(Total))
+```
+
+Creating a new varibale called "growth rate".This'll give the change in number of suicide cases YOY for each state.
+```{r,warning=FALSE}
+sui_2<- mutate(sui_1,gowth_rate_yoy=(total/lag(total)-1))
+
+#Removing the details for Lakshadweep,as it contain 'inf' and 'NaN'
+sui_2n <- sui_2[-c(217:228), ]
+```
+Generating line graph for YOY growth rate
+```{r}
+attach(sui_2n)
+ggplot(aes(x=Year,y=gowth_rate_yoy*100),data=filter(sui_2n,State %in% c("Bihar","Kerala","West Bengal","Madhya Pradesh")))+geom_point(aes(color=State))+geom_line(aes(color=State))+scale_x_continuous(breaks = seq(2001,2012,1))+scale_y_continuous(breaks = seq(-50,100,20))+geom_hline(yintercept = 0,linetype=5)+ylab("YOY Growth(%)")
+```
+
+Grouping the data by "age group" and "gender"
+```{r}
+sui_3 <- sui_cleaned %>% group_by(Gender,Age_group) %>% summarise(Total_sui=sum(Total))
+```
+Generating the bar graph showing suicide counts in various age-groups
+
+```{r}
+ggplot(aes(x=sui_3$Age_group,y=sui_3$Total_sui),data = sui_3)+geom_bar(stat="identity",aes(fill=sui_3$Gender),position="dodge")+xlab("AGE_GROUPS")+ylab("No of Suicides")+ggtitle("Suicide by age_group")
+```
+Grouping the data by state and age group
+
+```{r}
+sui_4 <- sui_cleaned %>% group_by(State,Age_group) %>% summarise(total=sum(Total))
+```
+```{r}
+ggplot(aes(x=sui_4$State,y=sui_4$total,fill=sui_4$Age_group),data = sui_4)+geom_bar(stat="identity",position = "dodge")+xlab("States")+ylab("Total suicides")+theme(axis.text.x = element_text(angle = -90,vjust=0,hjust=0))
+```
+
+
+Creating a data frame with columns as "year" and "total suicides"
+```{r}
+sui_YOY <- data.frame(tapply(sui$Total,sui$Year,sum))
+sui_YOY <- cbind(rownames(sui_YOY),data.frame(sui_YOY),row.names=NULL)
+names(sui_YOY) <- c("year","Total_Suicides")
+sui_YOY <- transform(sui_YOY,year=as.numeric(levels(year))[year])
+ggplot(data = sui_YOY,aes(x=year,y=Total_Suicides))+geom_line()+scale_x_continuous(breaks = seq(2001,2012,1))
+```
+
+Analyzing the causes of suicides
+```{r}
+sui_causes <- sui[which(sui$Type_code=="Causes"), ]
+causes_summary <- sui_causes %>% group_by(Type,Gender) %>% summarise(SUM=sum(Total))
+ggplot(data=causes_summary,aes(x=causes_summary$Type,y=causes_summary$SUM))+geom_bar(stat = "identity",aes(fill=causes_summary$Gender),position ="dodge")+theme(axis.text.x=element_text(angle =-90,vjust = 0,hjust=0))+ggtitle("Suicide Causes-by Gender")+theme(plot.title = element_text(hjust=.5,family="serif"))+xlab("Suicide Causes")+ylab("Suicide count")
+```
