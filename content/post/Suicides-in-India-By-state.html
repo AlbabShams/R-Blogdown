@@ -1,0 +1,52 @@
+---
+title: "Suicides In India-Kaggle Dataset"
+author: "Albab Shams"
+date: "08 April 2018"
+output: html_document
+---
+
+
+
+<pre class="r"><code>library(ggplot2)
+library(gridExtra)
+library(ggthemes)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(data.table)</code></pre>
+<pre class="r"><code>sui &lt;- read.csv(&quot;D:/DataSets/Practice datasets/suicides_in_India.csv&quot;)
+
+sui_cleaned &lt;- sui[which(sui$State!=&quot;Total (All India)&quot; &amp; sui$State!=&quot;Total(Uts)&quot; &amp; sui$State!=&quot;Total (States)&quot;) &amp; sui$Age_group!= &quot;0-100+&quot;, ]</code></pre>
+<p>Grouping the data by “state” and “year”</p>
+<pre class="r"><code>sui_1 &lt;- sui_cleaned %&gt;% group_by(State,Year) %&gt;% summarise(total=sum(Total))</code></pre>
+<p>Creating a new varibale called “growth rate”.This’ll give the change in number of suicide cases YOY for each state.</p>
+<pre class="r"><code>sui_2&lt;- mutate(sui_1,gowth_rate_yoy=(total/lag(total)-1))
+
+#Removing the details for Lakshadweep,as it contain &#39;inf&#39; and &#39;NaN&#39;
+sui_2n &lt;- sui_2[-c(217:228), ]</code></pre>
+<p>Generating line graph for YOY growth rate</p>
+<pre class="r"><code>attach(sui_2n)
+ggplot(aes(x=Year,y=gowth_rate_yoy*100),data=filter(sui_2n,State %in% c(&quot;Bihar&quot;,&quot;Kerala&quot;,&quot;West Bengal&quot;,&quot;Madhya Pradesh&quot;)))+geom_point(aes(color=State))+geom_line(aes(color=State))+scale_x_continuous(breaks = seq(2001,2012,1))+scale_y_continuous(breaks = seq(-50,100,20))+geom_hline(yintercept = 0,linetype=5)+ylab(&quot;YOY Growth(%)&quot;)</code></pre>
+<pre><code>## Warning: Removed 4 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 4 rows containing missing values (geom_path).</code></pre>
+<p><img src="/post/Suicides-in-India-By-state_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Grouping the data by “age group” and “gender”</p>
+<pre class="r"><code>sui_3 &lt;- sui_cleaned %&gt;% group_by(Gender,Age_group) %&gt;% summarise(Total_sui=sum(Total))</code></pre>
+<p>Generating the bar graph showing suicide counts in various age-groups</p>
+<pre class="r"><code>ggplot(aes(x=sui_3$Age_group,y=sui_3$Total_sui),data = sui_3)+geom_bar(stat=&quot;identity&quot;,aes(fill=sui_3$Gender),position=&quot;dodge&quot;)+xlab(&quot;AGE_GROUPS&quot;)+ylab(&quot;No of Suicides&quot;)+ggtitle(&quot;Suicide by age_group&quot;)</code></pre>
+<p><img src="/post/Suicides-in-India-By-state_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Grouping the data by state and age group</p>
+<pre class="r"><code>sui_4 &lt;- sui_cleaned %&gt;% group_by(State,Age_group) %&gt;% summarise(total=sum(Total))</code></pre>
+<pre class="r"><code>ggplot(aes(x=sui_4$State,y=sui_4$total,fill=sui_4$Age_group),data = sui_4)+geom_bar(stat=&quot;identity&quot;,position = &quot;dodge&quot;)+xlab(&quot;States&quot;)+ylab(&quot;Total suicides&quot;)+theme(axis.text.x = element_text(angle = -90,vjust=0,hjust=0))</code></pre>
+<p><img src="/post/Suicides-in-India-By-state_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Creating a data frame with columns as “year” and “total suicides”</p>
+<pre class="r"><code>sui_YOY &lt;- data.frame(tapply(sui$Total,sui$Year,sum))
+sui_YOY &lt;- cbind(rownames(sui_YOY),data.frame(sui_YOY),row.names=NULL)
+names(sui_YOY) &lt;- c(&quot;year&quot;,&quot;Total_Suicides&quot;)
+sui_YOY &lt;- transform(sui_YOY,year=as.numeric(levels(year))[year])
+ggplot(data = sui_YOY,aes(x=year,y=Total_Suicides))+geom_line()+scale_x_continuous(breaks = seq(2001,2012,1))</code></pre>
+<p><img src="/post/Suicides-in-India-By-state_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Analyzing the causes of suicides</p>
+<pre class="r"><code>sui_causes &lt;- sui[which(sui$Type_code==&quot;Causes&quot;), ]
+causes_summary &lt;- sui_causes %&gt;% group_by(Type,Gender) %&gt;% summarise(SUM=sum(Total))
+ggplot(data=causes_summary,aes(x=causes_summary$Type,y=causes_summary$SUM))+geom_bar(stat = &quot;identity&quot;,aes(fill=causes_summary$Gender),position =&quot;dodge&quot;)+theme(axis.text.x=element_text(angle =-90,vjust = 0,hjust=0))+ggtitle(&quot;Suicide Causes-by Gender&quot;)+theme(plot.title = element_text(hjust=.5,family=&quot;serif&quot;))+xlab(&quot;Suicide Causes&quot;)+ylab(&quot;Suicide count&quot;)</code></pre>
+<p><img src="/post/Suicides-in-India-By-state_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>

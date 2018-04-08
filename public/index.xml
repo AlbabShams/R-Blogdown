@@ -6,10 +6,19 @@
     <description>Recent content on My analytics practices</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 07 Feb 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 08 Apr 2018 17:29:10 +0530</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>2018 04 08 Suicides in India</title>
+      <link>/2018/04/08/2018-04-08-suicides-in-india/</link>
+      <pubDate>Sun, 08 Apr 2018 17:29:10 +0530</pubDate>
+      
+      <guid>/2018/04/08/2018-04-08-suicides-in-india/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Analysis of &#39;Gapminder unemployment 15&#43;&#39; dataset</title>
@@ -27,6 +36,17 @@
       
       <guid>/about/</guid>
       <description>I&amp;rsquo;m Akhtar Albab Shams,pursuing bachelor&amp;rsquo;s degree in electrical engg at KIIT University,Bhubaneswar,odisha.I&amp;rsquo;ve interests in data analytics,data science practices.Here,in this website I put some of my analytics practices.</description>
+    </item>
+    
+    <item>
+      <title>Suicides In India-Kaggle Dataset</title>
+      <link>/1/01/01/suicides-in-india-kaggle-dataset/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/1/01/01/suicides-in-india-kaggle-dataset/</guid>
+      <description>library(ggplot2)library(gridExtra)library(ggthemes)library(dplyr)library(tidyr)library(reshape2)library(data.table)sui &amp;lt;- read.csv(&amp;quot;D:/DataSets/Practice datasets/suicides_in_India.csv&amp;quot;)sui_cleaned &amp;lt;- sui[which(sui$State!=&amp;quot;Total (All India)&amp;quot; &amp;amp; sui$State!=&amp;quot;Total(Uts)&amp;quot; &amp;amp; sui$State!=&amp;quot;Total (States)&amp;quot;) &amp;amp; sui$Age_group!= &amp;quot;0-100+&amp;quot;, ]Grouping the data by “state” and “year”
+sui_1 &amp;lt;- sui_cleaned %&amp;gt;% group_by(State,Year) %&amp;gt;% summarise(total=sum(Total))Creating a new varibale called “growth rate”.This’ll give the change in number of suicide cases YOY for each state.
+sui_2&amp;lt;- mutate(sui_1,gowth_rate_yoy=(total/lag(total)-1))#Removing the details for Lakshadweep,as it contain &amp;#39;inf&amp;#39; and &amp;#39;NaN&amp;#39;sui_2n &amp;lt;- sui_2[-c(217:228), ]Generating line graph for YOY growth rate</description>
     </item>
     
   </channel>
